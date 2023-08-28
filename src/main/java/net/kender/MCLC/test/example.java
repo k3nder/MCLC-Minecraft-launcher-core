@@ -64,7 +64,7 @@ public class example {
 
         //get libraries of minecraft
         getLibs(MinecraftPath + "\\example\\" + version + "\\" + version + ".json",version, MinecraftPath + "\\example\\libs\\" + version);
-
+        //get assets
         String assetsIndexUrl = ReadFileAssetsIndex(  MinecraftPath + "\\example\\" + version + "\\" + version + ".json");
 
         String assestsContent = getJsonVersion(assetsIndexUrl);

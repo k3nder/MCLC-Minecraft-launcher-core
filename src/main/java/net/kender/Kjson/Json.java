@@ -159,7 +159,7 @@ public class Json {
    
         return objectMapper.readTree(e);
     }
-    public static JsonNode ContentOf(URI url){
+    public static JsonNode JContentOf(URI url){
         ObjectMapper a = new ObjectMapper();
         
         try {
@@ -174,6 +174,9 @@ public class Json {
             e.printStackTrace();
              return null;
         }
+    }
+    public static String SContentOf(URI url){
+        return JsonUtils.getJsonVersion(url.toString());
     }
 
 }

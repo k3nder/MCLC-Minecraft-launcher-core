@@ -20,7 +20,7 @@ public class ManifestExample {
         VMC last_snapshot = mani.getLastSnapshot();
 
         //1.20.1 is a example
-        VMC version = mani.getVersion("1.20.1");
+        VMC version = mani.getVersion("1.20.2");
 
         List<VMC> list_of_versions = mani.getList();
 

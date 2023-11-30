@@ -8,6 +8,8 @@ import net.kender.core.sample.Manifest;
 import net.kender.core.sample.Quikplays.Multiplayer;
 
 import java.nio.file.Path;
+import net.kender.MCutils.players.worlds.World;
+import net.kender.core.sample.Quikplays.SinglePlayer;
 
 public class Quikplay_example {
     public static void main(String[] args) {
@@ -19,5 +21,11 @@ public class Quikplay_example {
         Server a = new Server("play.minemagic.club","mine magic");
         Multiplayer mul = new Multiplayer(a);
         m.Run(mul);
+        
+        // to run World
+        
+        World s = new World(Path.of(/*path of minecraft world on the saves folder*/ "my/world"));
+        SinglePlayer sin = new SinglePlayer(s);
+        m.Run(sin);
     }
 }

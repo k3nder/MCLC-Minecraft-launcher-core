@@ -7,6 +7,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+
+import net.kender.core.Json.libreries.librarie;
+import net.kender.core.Json.libreries.os;
+import net.kender.core.Json.libreries.rule;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -14,36 +19,35 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class LIBS {
 
 
-    public static String getlibs(Path __DEST__, JsonNode libs) {
+    public static String getlibs(Path __DEST__, ArrayList<librarie> libs) {
 
 
         String pathLibs = "";
 
-        for (JsonNode libraryNode : libs) {
+        for (librarie libraryNode : libs) {
             // Paso 3: Acceder a los elementos "downloads" y "name" de cada objeto
             // "libraries"
-            JsonNode dowloads = libraryNode.get("downloads");
             
 
             // Verificar si "downloads" no es nulo
 
-            if (dowloads != null && dowloads.isObject()) {
+            if (libraryNode.downloads != null) {
                 try {
                     dons(__DEST__, libs);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
                 break;
-            } else if (libraryNode.get("url") != null) {
+            } else if (libraryNode.url != null) {
                 try {
                     
-                    int indexOfp = libraryNode.get("name").asText().lastIndexOf(":");
-                    String subversion = libraryNode.get("name").asText().substring(indexOfp + 1,
-                            libraryNode.get("name").asText().length());
-                    String etc = libraryNode.get("name").asText().substring(0, indexOfp);
-                    int indexOf = libraryNode.get("name").asText().indexOf(":");
-                    String nana = libraryNode.get("name").asText().substring(indexOf + 1, indexOfp);
-                    download(new URI(libraryNode.get("url").asText() + etc.replace(":", "/").replace(".", "/") + "/" + subversion + "/"
+                    int indexOfp = libraryNode.name.lastIndexOf(":");
+                    String subversion = libraryNode.name.substring(indexOfp + 1,
+                            libraryNode.name.length());
+                    String etc = libraryNode.name.substring(0, indexOfp);
+                    int indexOf = libraryNode.name.indexOf(":");
+                    String nana = libraryNode.name.substring(indexOf + 1, indexOfp);
+                    download(new URI(libraryNode.url + etc.replace(":", "/").replace(".", "/") + "/" + subversion + "/"
                             + nana + "-" + subversion + ".jar"), new File(__DEST__ + "\\" + nana + ".jar"));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
@@ -83,18 +87,15 @@ public class LIBS {
 
     }
 
-    public static void dons(Path dest, JsonNode a) throws URISyntaxException {
-
-        JsonNode libsNode = a;
+    public static void dons(Path dest, ArrayList<librarie> a) throws URISyntaxException {
 
         // Iterar a través de las librerías
-        for (JsonNode libNode : libsNode) {
-            JsonNode rulesNode = libNode.get("rules");
-            if (rulesNode == null) {
-                if (libNode.get("downloads").get("artifact") != null) {
-                    JsonNode libraryName = libNode.get("downloads").get("artifact").get("path");
-                    download(new URI(libNode.get("downloads").get("artifact").get("url").asText()),
-                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName.asText())));
+        for (librarie libNode : a) {
+            if (libNode.rules == null) {
+                if (libNode.downloads.artifact != null) {
+                    String libraryName = libNode.downloads.artifact.path;
+                    download(new URI(libNode.downloads.artifact.url),
+                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
 
                 }
                 continue;
@@ -102,12 +103,12 @@ public class LIBS {
 
             // Verificar reglas para la compatibilidad del sistema operativo
             boolean allowDownload = true;
-            for (JsonNode ruleNode : rulesNode) {
-                String action = ruleNode.get("action").asText();
-                JsonNode osNode = ruleNode.get("os");
+            for (rule ruleNode : libNode.rules) {
+                String action = ruleNode.action;
+                os osNode = ruleNode.os;
 
                 if (osNode != null) {
-                    String osName = osNode.get("name").asText();
+                    String osName = osNode.name;
                     if ("allow".equals(action) && !isCurrentOSCompatible(osName)) {
                         allowDownload = false;
                         break;
@@ -117,52 +118,47 @@ public class LIBS {
                     }
                 }
             }
-            if (libNode.has("natives")) {
-                if (libNode.get("natives").has("windows")) {
-                    JsonNode libraryName = libNode.get("downloads").get("classifiers").get("natives-windows");
-                    if (libNode.get("downloads").get("classifiers").get("natives-windows") == null) {
-                        libraryName = libNode.get("downloads").get("classifiers").get("natives-windows-64");
-                        if(libNode.get("downloads").get("classifiers").get("natives-windows-64") == null){
+            if (libNode.natives != null) {
+                if (libNode.natives.windows != null) {
+                    String libraryName = libNode.downloads.classifiers.windows.path;
+                    if (libNode.downloads.classifiers.windows == null) {
+                        libraryName = libNode.downloads.classifiers.windows64.path;
+                        if(libNode.downloads.classifiers.windows64 == null){
                             continue;
                         }
                     download(
-                            new URI(libNode.get("downloads").get("classifiers").get("natives-windows-64").get("url")
-                                    .asText()),
-                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName.get("path").asText())));
+                            new URI(libNode.downloads.classifiers.windows64.url),
+                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
                     } else {
-                        libraryName = libNode.get("downloads").get("classifiers").get("natives-windows").get("path");
+                        libraryName = libNode.downloads.classifiers.windows.path;
                         download(
-                            new URI(libNode.get("downloads").get("classifiers").get("natives-windows").get("url")
-                                    .asText()),
-                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName.asText())));
+                            new URI(libNode.downloads.classifiers.windows.url),
+                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
                     }
                     
                 }
             }
-            if (libNode.get("downloads").get("classifiers") != null) {
-                if (libNode.get("downloads").get("classifiers").get("natives-windows-64") != null) {
-                    JsonNode libraryName = libNode.get("downloads").get("classifiers").get("natives-windows-64")
-                            .get("path");
+            if (libNode.downloads.classifiers != null) {
+                if (libNode.downloads.classifiers.windows64 != null) {
+                    String libraryName = libNode.downloads.classifiers.windows64.path;
                     download(
-                            new URI(libNode.get("downloads").get("classifiers").get("natives-windows-64").get("url")
-                                    .asText()),
-                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName.asText())));
+                            new URI(libNode.downloads.classifiers.windows64.url),
+                            new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
                 }
             }
 
             // Descargar la librería si es compatible
             if (allowDownload) {
-                if (libNode.get("downloads").get("artifact") != null) {
-                    String downloadUrl = libNode.get("downloads").get("artifact").get("url").asText();
+                if (libNode.downloads.artifact != null) {
+                    String downloadUrl = libNode.downloads.artifact.url;
                     System.out.println("Descargando librería desde: " + downloadUrl);
-                    JsonNode libraryName = libNode.get("downloads").get("artifact").get("path");
-                    download(new URI(downloadUrl), new File(dest + "\\" + quitarUltimaParteRuta(libraryName.asText())));
-                    if (libNode.get("downloads").get("classifiers") != null) {
-                        libraryName = libNode.get("downloads").get("classifiers").get("natives-windows").get("path");
+                    String libraryName = libNode.downloads.artifact.path;
+                    download(new URI(downloadUrl), new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
+                    if (libNode.downloads.classifiers != null) {
+                        libraryName = libNode.downloads.classifiers.windows.path;
                         download(
-                                new URI(libNode.get("downloads").get("classifiers").get("natives-windows").get("url")
-                                        .asText()),
-                                new File(dest + "\\" + quitarUltimaParteRuta(libraryName.asText())));
+                                new URI(libNode.downloads.classifiers.windows.url),
+                                new File(dest + "\\" + quitarUltimaParteRuta(libraryName)));
 
                     }
                 }

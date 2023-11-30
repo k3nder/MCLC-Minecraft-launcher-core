@@ -18,10 +18,13 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.kender.Utils.utilsExtras;
 import net.kender.core.JsonUtils;
 import net.kender.core.assetsDowloader;
+import net.kender.core.Json.Version.versionJson;
 import net.kender.core.sample.EXTRAS.EXTRAS;
 import net.kender.core.sample.Quikplays.Quikplay;
 import net.kender.core.sample.Quikplays.profile;
@@ -57,7 +60,7 @@ public class MC {
 
     private int MaxRam = 4;
     private int minRam = 2;
-    private Path natives_path;
+    private Path natives_path = Path.of("debug/path");
 
     /**
      * @param __DEST__    destination
@@ -66,7 +69,7 @@ public class MC {
     public MC(Path __DEST__, VMC __VERSION__) {
         this.__DEST__ = __DEST__;
         this.__VERSION__ = __VERSION__;
-        natives_path = Path.of(__DEST__ + "\\versions\\" + __VERSION__ + "\\bin\\");
+        natives_path = Path.of(__DEST__ + "\\versions\\" + __VERSION__.getID() + "\\bin\\");
 
         try {
             download(new URI(
@@ -117,7 +120,7 @@ public class MC {
     public MC(profile profile) {
         this.__DEST__ = profile.getGameDir();
         this.__VERSION__ = profile.getVersion();
-        natives_path = Path.of(__DEST__ + "\\versions\\" + __VERSION__ + "\\bin\\");
+        natives_path = Path.of(__DEST__ + "\\versions\\" + __VERSION__.getID() + "\\bin\\");
         __JRE__ = profile.getJre();
 
         try {
@@ -163,25 +166,25 @@ public class MC {
         }
     }
 
-    private void downloadAndPreparating(JsonOfVersion vanilla, File JarV) {
-        download(utilsExtras.toURI(vanilla.downloads.get("client").get("url").asText()), JarV);
+    private void downloadAndPreparating(versionJson vanilla, File JarV) {
+        download(utilsExtras.toURI(vanilla.downloads.client.url), JarV);
         getlibs(__LIBS__, vanilla.libraries);
         natives(__LIBS__, Path
                 .of(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + "\\bin"));
 
         Assets(__DEST__, __VERSION__.toString(), vanilla.assets);
-        getJRE(vanilla.javaVersion);
+        getJRE(vanilla.javaVersion.majorVersion);
     }
 
-    private void downloadAndPreparating(JsonOfVersion vanilla, JsonOfVersion a, File JarV) {
-        download(utilsExtras.toURI(vanilla.downloads.get("client").get("url").asText()), JarV);
+    private void downloadAndPreparating(versionJson vanilla, versionJson a, File JarV) {
+        download(utilsExtras.toURI(vanilla.downloads.client.url), JarV);
         getlibs(__LIBS__, vanilla.libraries);
         getlibs(__LIBS__, a.libraries);
         natives(__LIBS__, Path
                 .of(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + "\\bin"));
 
         Assets(__DEST__, a.inheritsFrom, vanilla.assets);
-        getJRE(vanilla.javaVersion);
+        getJRE(vanilla.javaVersion.majorVersion);
     }
     /**
      * run minecraft
@@ -197,13 +200,23 @@ public class MC {
                 File JarV = new File(__DEST__.toString() + "\\versions\\" + __VERSION__.getID() + "\\"
                         + __VERSION__.getID() + ".jar");
                 createJsVe();
-                JsonOfVersion a = new JsonOfVersion(
-                        new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
+                versionJson a= null;
+                try {
+                    a = versionJson.load(
+                            new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
+                } catch (IOException ex) {
+                    Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 if (a.isCustom()) {
                     if (JsonV.exists()) {
                         URI vanillaVersionJ = new Manifest().getVersion(a.inheritsFrom).getUrl();
-                        JsonOfVersion vanilla = new JsonOfVersion(vanillaVersionJ);
+                        versionJson vanilla = null;
+                        try {
+                            vanilla = versionJson.load(vanillaVersionJ);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 
                         downloadAndPreparating(vanilla, a, JarV);
 
@@ -213,7 +226,7 @@ public class MC {
                                 minRam,
                                 vanilla.assets,
                                 __LIBS__.toString() + "\\*",
-                                a.mainClass, a.lastVersionId,
+                                a.mainClass, a.id,
                                 __GAMEDIR__.toString(),
                                 __JRE__.toString(),
                                 __DEST__,
@@ -223,7 +236,8 @@ public class MC {
                                 XUID,
                                 __CLIENTID__,
                                 __USERTYPE__,
-                                a.type.name(), natives_path);
+                                a.type,
+                                natives_path);
                         EXTRAS.run(t, null);
                     }
                 } else {
@@ -236,7 +250,7 @@ public class MC {
                                 minRam,
                                 a.assets,
                                 __LIBS__.toString() + "\\*",
-                                a.mainClass, a.lastVersionId,
+                                a.mainClass, a.id,
                                 __GAMEDIR__.toString(),
                                 __JRE__.toString(),
                                 __DEST__,
@@ -246,7 +260,8 @@ public class MC {
                                 XUID,
                                 __CLIENTID__,
                                 __USERTYPE__,
-                                a.type.name(), natives_path);
+                                a.type,
+                                natives_path);
                         EXTRAS.run(t, null);
                     }
                 }
@@ -273,13 +288,23 @@ public class MC {
                 File JarV = new File(__DEST__.toString() + "\\versions\\" + __VERSION__.getID() + "\\"
                         + __VERSION__.getID() + ".jar");
                 createJsVe();
-                JsonOfVersion a = new JsonOfVersion(
-                        new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
+                versionJson a = null;
+                try {
+                    a = versionJson.load(
+                            new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
+                } catch (IOException ex) {
+                    Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                }
 
                 if (a.isCustom()) {
                     if (JsonV.exists()) {
                         URI vanillaVersionJ = new Manifest().getVersion(a.inheritsFrom).getUrl();
-                        JsonOfVersion vanilla = new JsonOfVersion(vanillaVersionJ);
+                        versionJson vanilla = null;
+                        try {
+                            vanilla = versionJson.load(vanillaVersionJ);
+                        } catch (IOException ex) {
+                            Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 
                         downloadAndPreparating(vanilla, a, JarV);
 
@@ -289,7 +314,7 @@ public class MC {
                                 minRam,
                                 vanilla.assets,
                                 __LIBS__.toString() + "\\*",
-                                a.mainClass, a.lastVersionId,
+                                a.mainClass, a.id,
                                 __GAMEDIR__.toString(),
                                 __JRE__.toString(),
                                 __DEST__,
@@ -299,7 +324,8 @@ public class MC {
                                 XUID,
                                 __CLIENTID__,
                                 __USERTYPE__,
-                                a.type.name(), torun,natives_path);
+                                a.type, torun,
+                                natives_path);
                         EXTRAS.run(t, null);
                     }
                 } else {
@@ -312,7 +338,7 @@ public class MC {
                                 minRam,
                                 a.assets,
                                 __LIBS__.toString() + "\\*",
-                                a.mainClass, a.lastVersionId,
+                                a.mainClass, a.id,
                                 __GAMEDIR__.toString(),
                                 __JRE__.toString(),
                                 __DEST__,
@@ -322,7 +348,8 @@ public class MC {
                                 XUID,
                                 __CLIENTID__,
                                 __USERTYPE__,
-                                a.type.name(),torun,natives_path);
+                                a.type
+                                ,torun,natives_path);
                         EXTRAS.run(t, null);
                     }
                 }
@@ -450,17 +477,9 @@ public class MC {
         natives_path = a;
     }
 
-    private void getJRE(JsonNode javaVersion) {
+    private void getJRE(int javaVersion) {
 
-        int versionJava = 0;
-        JsonNode JVersionNode = null;
-        if (javaVersion == null) {
-            versionJava = 0;
-        } else {
-            JVersionNode = javaVersion.get("majorVersion");
-            versionJava = JVersionNode.asInt();
-        }
-        if (versionJava <= 8) {
+        if (javaVersion <= 8) {
             __JRE__ = Path.of(__DEST__ + "\\JRE\\8\\jre\\jdk8u382-b05-jre");
             // int JavaV = 8;
             // UtilsFiles.getnatives(__DEST__ + "\\versions\\" + __VERSION__ +

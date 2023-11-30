@@ -26,7 +26,7 @@ public class Manifest {
      */
     public Manifest(URI manifest){
         // itarar sobre cada objeto en el json en el objeto versions
-        for(JsonNode l:Json.ContentOf(manifest).get("versions")){
+        for(JsonNode l:Json.JContentOf(manifest).get("versions")){
             try {
                 // añadir al mapa de versiones
                 list.put(l.get("id").asText(),new VMC(l.get("id").asText(), VTC.toVType(l.get("type").asText()),new URI(l.get("url").asText())));
@@ -34,7 +34,7 @@ public class Manifest {
                 e.printStackTrace();
             }
         }
-        last = Json.ContentOf(manifest).get("latest");
+        last = Json.JContentOf(manifest).get("latest");
     }
     /**
      * create new manifest
@@ -43,7 +43,7 @@ public class Manifest {
     public Manifest() {
         try {
             // itarar sobre cada objeto en el json en el objeto versions
-            for(JsonNode l:Json.ContentOf(new URI("https://launchermeta.mojang.com/mc/game/version_manifest.json")).get("versions")){
+            for(JsonNode l:Json.JContentOf(new URI("https://launchermeta.mojang.com/mc/game/version_manifest.json")).get("versions")){
                 try {
                     // añadir al mapa de versiones
                     list.put(l.get("id").asText(),new VMC(l.get("id").asText(), VTC.toVType(l.get("type").asText()),new URI(l.get("url").asText())));
@@ -51,7 +51,7 @@ public class Manifest {
                     e.printStackTrace();
                 }
             }
-            last = Json.ContentOf(new URI("https://launchermeta.mojang.com/mc/game/version_manifest.json")).get("latest");
+            last = Json.JContentOf(new URI("https://launchermeta.mojang.com/mc/game/version_manifest.json")).get("latest");
         } catch (URISyntaxException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

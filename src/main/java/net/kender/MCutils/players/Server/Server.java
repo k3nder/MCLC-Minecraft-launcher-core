@@ -61,7 +61,7 @@ public class Server {
         try {
             URI e = new URI("https://api.mcsrvstat.us/3/" + ip);
             
-            JsonNode main = Json.ContentOf(e);
+            JsonNode main = Json.JContentOf(e);
 
             //* separation
 

@@ -19,6 +19,14 @@
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
+  <repositories>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/k3nder/Minecraft-Launcher-Core-Ultimate_MCLCU</url>
+    </repository>
+  </repositories>
+
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -39,11 +47,11 @@
       <version>2.16.0</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-<dependency>
-  <groupId>commons-io</groupId>
-  <artifactId>commons-io</artifactId>
-  <version>2.15.0</version>
-</dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.15.0</version>
+    </dependency>
 
   </dependencies>
 

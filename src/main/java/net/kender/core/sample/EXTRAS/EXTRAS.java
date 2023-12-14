@@ -79,8 +79,8 @@ public class EXTRAS {
 
     public static void run(CommandConstructor command, File Dyrectory) {
         try {
-            System.out.println(command.asText());
-            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", command.asText());
+            System.out.println(command.toString());
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", command.toString());
             processBuilder.directory(Dyrectory);
             processBuilder.redirectErrorStream(true); // Redirige la salida de ERROR al mismo flujo de entrada
 

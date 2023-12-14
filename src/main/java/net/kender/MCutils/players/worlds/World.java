@@ -7,16 +7,20 @@ import java.nio.file.Path;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.querz.nbt.io.NBTUtil;
-import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.StringTag;
-import net.querz.nbt.tag.Tag;
+import javafx.scene.image.Image;
+import net.kender.core.sample.Manifest;
+import net.kender.core.sample.VMC;
+import net.kender.nbt.io.NBTUtil;
+import net.kender.nbt.io.NamedTag;
+import net.kender.nbt.tag.CompoundTag;
+import net.kender.nbt.tag.StringTag;
+import net.kender.nbt.tag.Tag;
 import java.nio.file.*;
 import java.util.List;
 import java.util.ArrayList;
 
 public class World {
+    private VMC compatibleVersionMinimum;
     public Path world;
     private Seed seed = null;
     private CompoundTag tree;
@@ -44,14 +48,18 @@ public class World {
 				tree = levelDataTag;
 				// work our way down through the tree of compound tags until we got the compound tag that holds the compound tag with settings we need
 				CompoundTag generatorTag = levelDataTag.getCompoundTag("Data").getCompoundTag("WorldGenSettings");
+				CompoundTag generatorTagVersion = levelDataTag.getCompoundTag("Data").getCompoundTag("Version");
                 if(generatorTag == null){
                     System.out.println("corrupt or not generated file");
                     corrupt = true;
                 }else{
-                    Tag k = generatorTag.get("seed");
+                    Tag<?> seeds = generatorTag.get("seed");
+                    Tag<?> version = generatorTagVersion.get("Name");
 				    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode seed = mapper.readTree(k.toString());
+                    JsonNode seed = mapper.readTree(seeds.toString());
+                    JsonNode vers = mapper.readTree(version.toString());
                     this.seed = new Seed(seed.get("value").asText());
+                    this.compatibleVersionMinimum = new Manifest().getVersion(vers.get("value").asText());
                 }
 			}
 		} catch (IOException e) {
@@ -59,11 +67,14 @@ public class World {
 			e.printStackTrace();
 		}
     }
+    public boolean isCompatible(VMC vers){
+        return compatibleVersionMinimum.getID().equals(vers.getID());
+    }
     public Seed getSeed(){
         return this.seed;
     }
-    public File getIcon(){
-        return new File("file:///" + world + "\\icon.png");
+    public Image getIcon(){
+        return new Image("file:///" + world + "\\icon.png");
     }
     public String getName(){
         return world.getFileName().toString();
@@ -90,4 +101,7 @@ public class World {
         }
 		return list;
 	} 
+    public VMC getVersion(){
+        return compatibleVersionMinimum;
+    }
 }

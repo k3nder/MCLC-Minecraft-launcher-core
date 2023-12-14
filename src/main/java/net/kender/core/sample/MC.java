@@ -17,9 +17,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import net.kender.Utils.utilsExtras;
 import net.kender.core.JsonUtils;
@@ -28,6 +26,7 @@ import net.kender.core.Json.Version.versionJson;
 import net.kender.core.sample.EXTRAS.EXTRAS;
 import net.kender.core.sample.Quikplays.Quikplay;
 import net.kender.core.sample.Quikplays.profile;
+
 
 /**
  * instance to run mc
@@ -38,6 +37,13 @@ import net.kender.core.sample.Quikplays.profile;
  * @see {@link profiles}
  */
 public class MC {
+	private Runnable onStep = () ->{
+		System.out.println("step");
+	};
+	private Runnable onFinaly = () ->{
+		System.out.println("finaly");
+	};
+	
     public static final String USER_NAME = System.getProperty("user.name");
     public static final String DISC = "C:\\Users\\";
 
@@ -119,6 +125,13 @@ public class MC {
      */
     public MC(profile profile) {
         this.__DEST__ = profile.getGameDir();
+        if(!__DEST__.toFile().exists()){
+            try {
+                __DEST__.toFile().createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         this.__VERSION__ = profile.getVersion();
         natives_path = Path.of(__DEST__ + "\\versions\\" + __VERSION__.getID() + "\\bin\\");
         __JRE__ = profile.getJre();
@@ -193,7 +206,7 @@ public class MC {
         Thread r = new Thread(new Runnable() {
 
             public void run() {
-
+            	onStep.run();
                 File JsonV = new File(
                         __DEST__.toString() + "\\versions\\" + __VERSION__.getID() + "\\" + __VERSION__.getID()
                                 + ".json");
@@ -201,25 +214,43 @@ public class MC {
                         + __VERSION__.getID() + ".jar");
                 createJsVe();
                 versionJson a= null;
+                onStep.run();
                 try {
                     a = versionJson.load(
                             new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
                 } catch (IOException ex) {
-                    Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }
+                onStep.run();
 
                 if (a.isCustom()) {
                     if (JsonV.exists()) {
                         URI vanillaVersionJ = new Manifest().getVersion(a.inheritsFrom).getUrl();
+                        onStep.run();
                         versionJson vanilla = null;
                         try {
                             vanilla = versionJson.load(vanillaVersionJ);
                         } catch (IOException ex) {
-                            Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                            ///Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        onStep.run();
 
                         downloadAndPreparating(vanilla, a, JarV);
+                        //limpiarDirectorio(new File(__GAMEDIR__ + "\\mods\\"));
+                        //if(!__VERSION__.complement.isEmpty()) {
+                        //	for(Version ls:__VERSION__.complement) {
+                        //		try {
+						//			ls.download(__GAMEDIR__, __VERSION__.getVersionid(),__VERSION__.getLoader().name());
+						//		} catch (JsonProcessingException | URISyntaxException e) {
+						//			// TODO Auto-generated catch block
+						//			e.printStackTrace();
+						//		}
+                        //	}
+                        //}
 
+
+                        
+                        onFinaly.run();
                         CommandConstructor t = new CommandConstructor(
                                 __USER__,
                                 MaxRam,
@@ -242,7 +273,11 @@ public class MC {
                     }
                 } else {
                     if (JsonV.exists()) {
+                    	onStep.run();
                         downloadAndPreparating(a, JarV);
+                        onStep.run();
+
+                        onFinaly.run();
                         
                         CommandConstructor t = new CommandConstructor(
                                 __USER__,
@@ -269,6 +304,30 @@ public class MC {
         });
         r.start();
     }
+    
+    private void limpiarDirectorio(File directorio) {
+        // Verificar si el objeto File representa un directorio
+        if (directorio.isDirectory()) {
+            // Obtener lista de archivos y subdirectorios en el directorio
+            File[] archivos = directorio.listFiles();
+
+            // Iterar sobre los archivos y directorios y eliminarlos
+            if (archivos != null) {
+                for (File archivo : archivos) {
+                    if (archivo.isDirectory()) {
+                        // Llamada recursiva para eliminar subdirectorios
+                        limpiarDirectorio(archivo);
+                    } else {
+                        // Eliminar archivos
+                        archivo.delete();
+                    }
+                }
+            }
+        }
+
+        // Eliminar el directorio después de haber eliminado todos los archivos
+        directorio.delete();
+    }
 
 
     /**
@@ -281,7 +340,7 @@ public class MC {
         Thread r = new Thread(new Runnable() {
 
             public void run() {
-
+            	onStep.run();
                 File JsonV = new File(
                         __DEST__.toString() + "\\versions\\" + __VERSION__.getID() + "\\" + __VERSION__.getID()
                                 + ".json");
@@ -289,24 +348,30 @@ public class MC {
                         + __VERSION__.getID() + ".jar");
                 createJsVe();
                 versionJson a = null;
+                onStep.run();
                 try {
                     a = versionJson.load(
                             new File(__DEST__.toString() + "\\versions\\" + __VERSION__ + "\\" + __VERSION__ + ".json"));
                 } catch (IOException ex) {
-                    Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                    ////Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                onStep.run();
 
                 if (a.isCustom()) {
                     if (JsonV.exists()) {
                         URI vanillaVersionJ = new Manifest().getVersion(a.inheritsFrom).getUrl();
+                        onStep.run();
                         versionJson vanilla = null;
                         try {
                             vanilla = versionJson.load(vanillaVersionJ);
                         } catch (IOException ex) {
-                            Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
+                            ////Logger.getLogger(MC.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        onStep.run();
 
                         downloadAndPreparating(vanilla, a, JarV);
+                        
+                        onFinaly.run();
 
                         CommandConstructor t = new CommandConstructor(
                                 __USER__,
@@ -330,8 +395,10 @@ public class MC {
                     }
                 } else {
                     if (JsonV.exists()) {
+                    	onStep.run();
                         downloadAndPreparating(a, JarV);
-                        
+                        onStep.run();
+                        onFinaly.run();
                         CommandConstructor t = new CommandConstructor(
                                 __USER__,
                                 MaxRam,
@@ -476,7 +543,15 @@ public class MC {
     public void setNativesPath(Path a) {
         natives_path = a;
     }
-
+    
+    public void setOnStep(Runnable s) {
+    	onStep = s;
+    }
+    
+    public void onFinaly(Runnable s) {
+    	onFinaly = s;
+    }
+    
     private void getJRE(int javaVersion) {
 
         if (javaVersion <= 8) {

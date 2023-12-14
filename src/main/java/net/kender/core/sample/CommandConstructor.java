@@ -47,13 +47,11 @@ public class CommandConstructor {
                         command += ":" + r.sp;
                     }
                 }else if(r.w != null){
-                    command += " --quickPlaySingleplayer " + r.w.world.getFileName();
+                    command += " --quickPlaySingleplayer \"" + r.w.world.getFileName() + "\"";
                 }
     }
-    public CommandConstructor(profile a){
-
-    }
-    public String asText(){
+    @Override
+    public String toString(){
         return command;
     }
     public void setJavaArgs(String[] args){

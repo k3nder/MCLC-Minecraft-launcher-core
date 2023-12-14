@@ -1,5 +1,5 @@
 package net.kender.core;
-
+import java.lang.*;
 
 import static net.kender.core.sample.EXTRAS.EXTRAS.*;
 

@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javafx.scene.image.Image;
 
 public class DataPack {
     private File file;
 
-    /**
-     * @param file zip datapack to load
-     */
     public DataPack(File file){
         this.file = file;
     }
@@ -40,7 +38,7 @@ public class DataPack {
             return null;
         }
     }
-    private InputStream readZIPI(File a) {
+    private Image readZIPI(File a) {
         try (ZipFile zipFile = new ZipFile(a)) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             while (entries.hasMoreElements()) {
@@ -48,7 +46,7 @@ public class DataPack {
 
                 if (entry.getName().equals("pack.png")) {
                     try (InputStream inputStream = zipFile.getInputStream(entry)) {
-                        return inputStream;
+                        return new Image(inputStream);
                     }
                 }else{
                     return null;
@@ -60,9 +58,6 @@ public class DataPack {
             return null;
         }
     }
-    /**
-     * @return is datapack or no
-     */
     public Boolean isDataPack(){
         try (ZipFile zipFile = new ZipFile(file)) {
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -81,15 +76,9 @@ public class DataPack {
             return false;
         }
     }
-    /**
-     * @return icon of the datapack
-     */
-    public InputStream getIcon(){
+    public Image getIcon(){
         return readZIPI(file);
     }
-    /**
-     * @return list of aviable versions
-     */
     public List<Integer> getVersion(){
         JsonNode root = readZIPJ(file);
         List<Integer> list = new ArrayList<Integer>();
@@ -107,9 +96,6 @@ public class DataPack {
         return list;
         
     }
-    /**
-     * @return get description of the datapack
-     */
     public String getDescription(){
         String Return = "";
         JsonNode root = readZIPJ(file);

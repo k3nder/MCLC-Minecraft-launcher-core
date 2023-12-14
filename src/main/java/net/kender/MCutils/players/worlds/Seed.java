@@ -8,19 +8,13 @@ public class Seed {
     public Seed(String seed){
         Seed = seed;
     }
-    /**
-     * open seed on chunkbase https://www.chunkbase.com/apps/
-     */
     public void openOnChunckBase(){
-        opneOnWeb("https://www.chunkbase.com/apps/biome-finder#" + Seed);
+        abrirNavegador("https://www.chunkbase.com/apps/biome-finder#" + Seed);
     }
-    /**
-     * @return seed to string
-     */
     public String toString(){
         return Seed;
     }
-    private static void opneOnWeb(String url) {
+    private static void abrirNavegador(String url) {
         try {
             // Verifica si el sistema soporta la clase Desktop
             if (Desktop.isDesktopSupported()) {

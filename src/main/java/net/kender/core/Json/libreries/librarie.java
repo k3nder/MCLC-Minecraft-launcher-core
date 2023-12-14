@@ -9,4 +9,9 @@ public class librarie {
     public ArrayList<rule> rules;
     public String url;
     public nat natives;
+    public String md5;
+    public String sha1;
+    public String sha256;
+    public String sha512;
+    public String size;
 }

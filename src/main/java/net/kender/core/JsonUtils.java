@@ -66,8 +66,7 @@ public class JsonUtils {
         StringBuilder jsonString = new StringBuilder();
 
         try {
-            URI uri = new URI(url);
-            URL urlReform = uri.toURL();
+            URL urlReform = new URL(url);
             
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlReform.openStream()));
             jsonString = new StringBuilder();
@@ -79,7 +78,7 @@ public class JsonUtils {
             }
             reader.close();
 
-        } catch (IOException | URISyntaxException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return jsonString.toString();

@@ -39,7 +39,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.kender</groupId>
-			<artifactId>utils</artifactId>
+			<artifactId>kutils</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
